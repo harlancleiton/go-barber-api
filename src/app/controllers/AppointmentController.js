@@ -110,7 +110,10 @@ class AppointmentController {
     const { id } = req.params;
 
     const appointment = await Appointment.findByPk(id, {
-      include: [{ model: User, as: 'provider', attributes: ['name', 'email'] }],
+      include: [
+        { model: User, as: 'provider', attributes: ['name', 'email'] },
+        { model: User, as: 'user', attributes: ['name'] },
+      ],
     });
 
     if (!appointment) {
@@ -139,7 +142,15 @@ class AppointmentController {
     await Mail.sendMail({
       to: `${provider.name} <${provider.email}>`,
       subject: 'Agendamento cancelado',
-      text: 'Você tem um novo cancelamento',
+      // text: 'Você tem um novo cancelamento',
+      template: 'cancelation',
+      context: {
+        provider: appointment.provider.name,
+        user: appointment.user.name,
+        date: format(appointment.date, "dd 'de' MMMM', às' H:mm'h'", {
+          locale: pt,
+        }),
+      },
     });
 
     return res.status(204).json();
