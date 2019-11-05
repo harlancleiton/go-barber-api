@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import User from '../models/User';
+import File from '../models/File';
 
 class UserController {
   async store(req, res) {
@@ -62,7 +63,13 @@ class UserController {
 
     await user.update(req.body);
 
-    return res.status(204).send();
+    const { id, name, avatar } = await User.findByPk(user.id, {
+      include: [
+        { model: File, as: 'avatar', attributes: ['path', 'id', 'url'] },
+      ],
+    });
+
+    return res.json({ id, name, avatar });
   }
 }
 
