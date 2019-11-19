@@ -5,11 +5,9 @@ class NotificationController {
     const { user } = req;
 
     if (!user.provider) {
-      if (!user.provider) {
-        return res
-          .status(403)
-          .json({ error: 'Only provider can load notifications' });
-      }
+      return res
+        .status(403)
+        .json({ error: 'Only provider can load notifications' });
     }
 
     const notifications = await Notification.find({ user: user.id })
